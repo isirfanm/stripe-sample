@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stripe Indonesia Bank instructions</title>
+    <meta name="description" content="A demo of Stripe Payment Intents" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/global.css" />
+    <script>
+      async function loadInstructions() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const location = urlParams.get("src");
+        const subscriptionId = urlParams.get("sub_id");
+
+        console.log(location);
+
+        document.getElementById("frame").src = location;
+
+        const subResp = await fetch("/subscription/" + subscriptionId, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        const subJson = await subResp.json();
+
+        console.log(subJson);
+      }
+
+      async function checkCompleted(e) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const subscriptionId = urlParams.get("sub_id");
+
+        const subResp = await fetch("/subscription/" + subscriptionId, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const subJson = await subResp.json();
+        console.log(subJson);
+
+        if (!subJson.latest_invoice.paid) {
+          window.alert("Invoice has not been paid");
+          return;
+        }
+
+        window.location.href = "/completed.html";
+      }
+    </script>
+  </head>
+
+  <body onload="loadInstructions();">
+    <div style="background-color: rgb(240, 242, 248);">
+      <div style="margin: 10px; display: flex; align-content: flex-end;">
+        <button onclick="checkCompleted();">Completed Payment</button>
+      </div>
+      <div class="sr-root">
+        <div class="sr-main">
+          <iframe
+            id="frame"
+            scrolling="no"
+            style="border: none; width: 100%; height: 750px; overflow: hidden;"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
